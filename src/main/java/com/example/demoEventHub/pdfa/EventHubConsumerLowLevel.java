@@ -5,14 +5,18 @@ import com.azure.messaging.eventhubs.EventData;
 import com.azure.messaging.eventhubs.EventHubClientBuilder;
 import com.azure.messaging.eventhubs.EventHubConsumerAsyncClient;
 import com.azure.messaging.eventhubs.models.EventPosition;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EventHubConsumerLowLevel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventHubConsumerLowLevel.class);
 
-    public static void main(String[] args) {
+    @PostConstruct
+    public void startListening() {
         String namespace = "pdfa-dev-namespace.servicebus.windows.net";
         String eventHubName = "pdfa-eventhub";
 
