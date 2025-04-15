@@ -20,12 +20,13 @@ public class EventConsumer {
 
     @Bean
     public Consumer<Message<String>> consume() {
+        LOGGER.info("PDF/A EVENT CONSUMER STARTED");
         return message -> {
             try {
                 PdfaEvent event = objectMapper.readValue(message.getPayload(), PdfaEvent.class);
-                LOGGER.info("Received EventHub Message: JobId={}, Status={}, CustomerId={}", event.getConversionJobId(), event.getStatus(), event.getCustomerId());
+                LOGGER.info("Received PDF/A EventHub Message: JobId={}, Status={}, CustomerId={}", event.getConversionJobId(), event.getStatus(), event.getCustomerId());
             } catch (Exception e) {
-                LOGGER.error("Error processing message", e);
+                LOGGER.error("Error processing PDF/A message", e);
             }
         };
     }
