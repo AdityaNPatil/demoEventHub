@@ -1,10 +1,9 @@
 package com.example.demoEventHub.pdfa;
 
 import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.azure.messaging.eventhubs.EventData;
 import com.azure.messaging.eventhubs.EventHubClientBuilder;
 import com.azure.messaging.eventhubs.EventHubConsumerAsyncClient;
-import com.azure.messaging.eventhubs.models.EventPosition;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class EventHubConsumerLowLevel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventHubConsumerLowLevel.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostConstruct
     public void startListening() {
@@ -29,12 +29,15 @@ public class EventHubConsumerLowLevel {
 
         LOGGER.info("PDF/A Low Level Consumer Started...");
 
-        consumer.getPartitionIds().subscribe(partitionId -> {
-            consumer.receiveFromPartition(partitionId, EventPosition.latest())
-                    .subscribe(event -> {
-                        String body = event.getData().getBodyAsString();
-                        LOGGER.info("Received PDF/A message from partition {}: {}", partitionId, body);
-                    });
+        consumer.receive(false)
+                .subscribe(partitionEvent -> {
+                    try {
+                        String payload = partitionEvent.getData().getBodyAsString();
+                        PdfaEvent event = objectMapper.readValue(payload, PdfaEvent.class);
+                        LOGGER.info("JobID={}, Status={}, CustomerId={}", event.getConversionJobId(), event.getStatus(), event.getCustomerId());
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to process message", e);
+                    }
         });
     }
 }
