@@ -60,7 +60,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'pdfaApp'
+          app-name: 'pdfaWebApp'
           slot-name: 'Production'
           package: '*.jar'
           
